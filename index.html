@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Pila de Fotos</title>
+<title>Pila de Fotos - Dark Mode</title>
 
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#000000">
@@ -41,24 +41,22 @@
         background: var(--bg);
         color: var(--text);
         font-family: var(--font-main);
-        height: 100vh;
+        height: 100vh; 
         display: flex;
         flex-direction: column;
         overflow: hidden;
     }
 
     h1 {
-        position: absolute;
-        top: 20px;
-        left: 20px;
+        position: relative;
+        padding: 20px 20px 10px 20px;
         margin: 0;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: 600;
         letter-spacing: 1px;
         text-transform: uppercase;
-        z-index: 10;
-        pointer-events: none;
         opacity: 0.8;
+        flex-shrink: 0;
     }
 
     #canvas-container {
@@ -66,11 +64,10 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        position: relative;
         width: 100%;
-        height: calc(100vh - 190px); 
-        padding: 20px;
+        padding: 10px;
         background: #000;
+        min-height: 0;
     }
 
     canvas {
@@ -82,23 +79,21 @@
     }
 
     /* ======================================================
-       PANEL DE CONTROL (Optimizado para Móvil)
+        PANEL DE CONTROL
     ====================================================== */
     .control-panel {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        position: relative; 
         background: var(--panel-bg);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border-top: 1px solid var(--border);
-        padding: 16px 16px env(safe-area-inset-bottom, 16px);
+        padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
         z-index: 100;
         display: flex;
         flex-direction: column;
         gap: 12px;
         box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+        flex-shrink: 0;
     }
 
     .controls-row {
