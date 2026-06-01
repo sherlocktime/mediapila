@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Pila de Fotos - Dark Mode</title>
+<title>Pila de Fotos</title>
 
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#000000">
@@ -223,16 +223,16 @@
         bottom: calc(100% + 6px);
         left: 0;
         right: 0;
-        background: rgba(25://25, 25, 0.98);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
+        /* Cambiamos a un negro sólido o casi sólido */
+        background: #121212; 
         border: 1px solid var(--border);
         border-radius: 6px;
         max-height: 450px;
         overflow-y: auto;
         display: none;
         z-index: 110;
-        box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
+        /* Aumentamos la sombra para separarlo visualmente del fondo */
+        box-shadow: 0 -8px 30px rgba(0,0,0,0.8);
     }
 
     .custom-options-list.show {
