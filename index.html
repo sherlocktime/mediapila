@@ -170,7 +170,7 @@
     }
 
     /* ======================================================
-       BOTONES CUADRADOS (Iconos solos)
+    BOTONES CUADRADOS (Iconos solos)
     ====================================================== */
     button.icon-btn {
         background: var(--btn-bg);
@@ -196,6 +196,22 @@
     }
 
     button.icon-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Botón Aleatorio destacado en amarillo */
+    #randomBtn {
+        color: var(--accent);
+        border-color: var(--accent);
+        background: rgba(255, 204, 0, 0.1);
+    }
+
+    #randomBtn:hover {
+        background: rgba(255, 204, 0, 0.2);
+        border-color: var(--accent);
+    }
+
+    #randomBtn:active {
         transform: scale(0.95);
     }
 
@@ -325,7 +341,7 @@
             <input id="files" type="file" multiple accept="image/*">
         </label>
         
-        <button id="randomBtn" class="icon-btn" title="Aleatorio">⟳</button>
+        <button id="randomBtn" class="icon-btn" title="Aleatorio">⚡</button>
         
         <button id="downloadBtn" class="rect-btn">Exportar</button>
     </div>
