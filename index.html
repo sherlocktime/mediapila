@@ -6,7 +6,7 @@
 <title>Pila de Fotos</title>
 
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#121212">
 
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,20 +14,20 @@
 
 <style>
     /* ======================================================
-       VARIABLES & BASE
+        VARIABLES & BASE (Estilo iOS / Android Premium)
     ====================================================== */
     :root {
         --bg: #000000;
-        --panel-bg: rgba(20, 20, 20, 0.95);
-        --border: rgba(255, 255, 255, 0.2);
+        --panel-bg: rgba(20, 20, 20, 0.75);
+        --surface-menu: #1c1c1e; /* Color gris oscuro de tarjeta nativa */
+        --border: rgba(255, 255, 255, 0.08); /* Bordes más sutiles */
         --accent: #ffcc00;
+        --accent-bg: rgba(255, 204, 0, 0.15);
         --text: #ffffff;
-        --muted: #aaaaaa;
-        --btn-bg: rgba(255, 255, 255, 0.1);
-        --btn-hover: rgba(255, 255, 255, 0.2);
-        --font-main: system-ui, -apple-system, sans-serif;
-        --btn-height: 44px;
-        --icon-btn-size: 44px;
+        --muted: #8e8e93; /* Gris iOS */
+        --btn-bg: rgba(255, 255, 255, 0.08);
+        --btn-hover: rgba(255, 255, 255, 0.15);
+        --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     * {
@@ -41,23 +41,23 @@
         background: var(--bg);
         color: var(--text);
         font-family: var(--font-main);
-        height: 100vh; 
         height: 100dvh;
         display: flex;
         flex-direction: column;
         overflow: hidden;
     }
 
+    /* Header estilo barra de app nativa */
     h1 {
-        position: relative;
-        padding: 20px 20px 10px 20px;
+        padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
         margin: 0;
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 600;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        opacity: 0.8;
-        flex-shrink: 0;
+        text-align: center;
+        border-bottom: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
     }
 
     #canvas-container {
@@ -65,37 +65,31 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 100%;
-        padding: 10px;
-        background: #000;
+        padding: 16px;
         min-height: 0;
-    }
 
-    canvas {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-        box-shadow: 0 0 20px rgba(0,0,0,0.8);
-        border: 1px solid var(--border);
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 12px; /* Esquinas redondeadas para el canvas */
+            box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+        }
     }
 
     /* ======================================================
-        PANEL DE CONTROL
+        PANEL DE CONTROL (Estilo Tab Bar / Bottom Sheet)
     ====================================================== */
     .control-panel {
-        position: relative; 
         background: var(--panel-bg);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(30px); /* Desenfoque más profundo estilo iOS */
+        -webkit-backdrop-filter: blur(30px);
         border-top: 1px solid var(--border);
-        /* Reducimos un poco el padding para ganar espacio vertical */
-        padding: 12px 16px calc(8px + env(safe-area-inset-bottom, 8px));
-        z-index: 100;
+        padding: 16px 16px calc(12px + env(safe-area-inset-bottom, 12px));
         display: flex;
         flex-direction: column;
-        gap: 8px; /* Reducido de 12px a 8px */
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
-        flex-shrink: 0;
+        gap: 12px;
+        box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
     }
 
     .controls-row {
@@ -106,230 +100,169 @@
         width: 100%;
         max-width: 500px;
         margin: 0 auto;
-    }
 
-    .controls-row.full-width {
-        grid-template-columns: 1fr;
+        &.full-width {
+            grid-template-columns: 1fr;
+        }
     }
 
     /* ======================================================
-       BOTONES RECTANGULARES (Cargar, Guardar, Custom Selects)
+        BOTONES COMPARTIDOS Y SIMPLIFICADOS
     ====================================================== */
-    button.rect-btn, .file-upload-label, .custom-select-trigger {
-        background: var(--btn-bg);
+    /* Unificamos todas las propiedades comunes en un selector mas limpio */
+    button, .file-upload-label {
+        font-family: inherit;
         color: var(--text);
+        background: var(--btn-bg);
         border: 1px solid var(--border);
-        padding: 0 14px; 
-        font-size: 11px;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        cursor: pointer;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-        user-select: none;
+        height: 46px; /* Altura ideal de toque móvil */
+        border-radius: 10px; /* Radio más nativo de app */
+        font-size: 13px;
+        font-weight: 500;
         display: inline-flex;
         align-items: center;
         justify-content: flex-start; 
-        height: var(--btn-height);
-        width: 100%; 
-        font-family: var(--font-main);
+        padding: 0 14px;
+        cursor: pointer;
+        user-select: none;
+        transition: background 0.15s ease, transform 0.1s ease;
+
+        &:active {
+            transform: scale(0.97); /* Feedback táctil */
+            background: var(--btn-hover);
+        }
     }
 
-    button.rect-btn:hover, .file-upload-label:hover, .custom-select-trigger:hover {
-        background: var(--btn-hover);
-        border-color: rgba(255,255,255,0.4);
+    /* Botones rectangulares específicos y selectores */
+    .rect-btn, .file-upload-label, .custom-select-trigger {
+        width: 100%;
+        padding-left: 14px;
     }
 
-    button.rect-btn:active, .file-upload-label:active, .custom-select-trigger:active {
-        transform: scale(0.98);
+    .custom-select-trigger {
+        justify-content: space-between;
+        &::after {
+            content: "▾";
+            color: var(--muted);
+            font-size: 12px;
+        }
     }
 
-    #downloadBtn {
-        background: rgba(255, 204, 0, 0.15);
-        border-color: var(--accent);
-        color: var(--accent);
-    }
-
-    #downloadBtn:hover {
-        background: rgba(255, 204, 0, 0.3);
-    }
-
-    #files {
-        display: none;
-    }
-
+    /* Variantes de botones de acción */
     .file-upload-label {
-        background: var(--accent);
-        color: #000;
+        background: #ffffff;
+        color: #000000;
+        font-weight: 600;
         border: none;
     }
 
-    .file-upload-label:hover {
-        background: #e6b800;
+    #downloadBtn {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: rgba(255, 204, 0, 0.2);
+        font-weight: 600;
     }
 
-    /* ======================================================
-    BOTONES CUADRADOS (Iconos solos)
-    ====================================================== */
+    #files { display: none; }
+
+    /* Botones Cuadrados (Iconos) */
     button.icon-btn {
-        background: var(--btn-bg);
-        color: var(--text);
-        border: 1px solid var(--border);
-        padding: 0;
-        cursor: pointer;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-        user-select: none;
-        display: inline-flex;
-        align-items: center;
+        width: 46px;
+        font-size: 16px;
         justify-content: center;
-        width: var(--icon-btn-size);
-        height: var(--icon-btn-size);
-        font-size: 18px; 
-        line-height: 1;
+        padding: 0;
     }
 
-    button.icon-btn:hover {
-        background: var(--btn-hover);
-        border-color: rgba(255,255,255,0.4);
-    }
-
-    button.icon-btn:active {
-        transform: scale(0.95);
-    }
-
-    /* Botón Aleatorio destacado en amarillo */
     #randomBtn {
         color: var(--accent);
-        border-color: var(--accent);
-        background: rgba(255, 204, 0, 0.1);
-    }
-
-    #randomBtn:hover {
-        background: rgba(255, 204, 0, 0.2);
-        border-color: var(--accent);
-    }
-
-    #randomBtn:active {
-        transform: scale(0.95);
+        background: var(--accent-bg);
+        border-color: rgba(255, 204, 0, 0.2);
     }
 
     /* ======================================================
-       NUEVOS SELECTORES PERSONALIZADOS (Dropdowns pequeños)
+        MENÚS DESPLEGABLES (Estilo Context Menu Nativo)
     ====================================================== */
     .custom-select-container {
         position: relative;
         width: 100%;
     }
 
-    .custom-select-trigger {
-        justify-content: space-between;
-    }
-
-    .custom-select-trigger::after {
-        content: "▼";
-        font-size: 8px;
-        color: var(--muted);
-        margin-left: 8px;
-    }
-
     .custom-options-list {
         position: absolute;
-        bottom: calc(100% + 6px);
+        bottom: calc(100% + 8px);
         left: 0;
         right: 0;
-        /* Cambiamos a un negro sólido o casi sólido */
-        background: #121212; 
+        background: var(--surface-menu);
         border: 1px solid var(--border);
-        border-radius: 6px;
-        max-height: 450px;
+        border-radius: 13px; /* Bordes muy redondeados estilo menú iOS */
+        max-height: 280px;
         overflow-y: auto;
         display: none;
         z-index: 110;
-        /* Aumentamos la sombra para separarlo visualmente del fondo */
-        box-shadow: 0 -8px 30px rgba(0,0,0,0.8);
-    }
+        box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        padding: 4px; /* Espaciado interno para los ítems */
 
-    .custom-options-list.show {
-        display: block;
+        &.show { display: block; }
     }
 
     .custom-option {
         padding: 12px 14px;
-        font-size: 11px;
-        font-weight: bold;
-        text-transform: uppercase;
+        font-size: 14px;
+        border-radius: 8px; /* Elementos internos redondeados */
         color: var(--text);
         cursor: pointer;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
         text-align: left;
-    }
+        transition: background 0.1s;
 
-    .custom-option:last-child {
-        border-bottom: none;
-    }
-
-    .custom-option:hidden {
-        display: none;
-    }
-
-    .custom-option.selected {
-        color: var(--accent);
-        background: rgba(255, 255, 255, 0.05);
-    }
-
-    .custom-option:active {
-        background: var(--btn-hover);
+        &:active { background: rgba(255,255,255,0.1); }
+        &.selected { color: var(--accent); background: rgba(255,255,255,0.05); }
     }
 
     /* ======================================================
-       SLIDER
+        SLIDER & TEXTOS
     ====================================================== */
     .slider-group {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 14px;
         width: 100%;
-        background: rgba(255,255,255,0.03);
-        padding: 6px 12px;
-        border-radius: 4px;
-        border: 1px solid rgba(255,255,255,0.05);
+        background: rgba(255,255,255,0.04);
+        padding: 10px 16px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
     }
 
     input[type="range"] {
         -webkit-appearance: none;
         flex: 1;
-        height: 6px;
-        background: var(--border);
-        border-radius: 3px;
+        height: 4px; /* Más delgado y sutil */
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
         outline: none;
-    }
 
-    input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 18px;
-        height: 18px;
-        background: var(--accent);
-        cursor: pointer;
-        border-radius: 50%;
-        border: 2px solid #fff;
+        &::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px; /* Selector más grande, fácil de arrastrar con el dedo */
+            height: 24px;
+            background: #ffffff;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
     }
 
     .status-text {
-        font-size: 10px;
+        font-size: 11px;
         color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
         text-align: center;
-        padding-top: 4px;
-        margin-bottom: 2px;
+        padding-top: 2px;
+        font-weight: 400;
     }
 </style>
 </head>
 <body>
 
-<h1>📸 Pila de Fotos</h1>
+<h1>Pila de Fotos</h1>
 
 <div id="canvas-container">
     <canvas id="canvas"></canvas>
@@ -343,7 +276,7 @@
         
         <button id="randomBtn" class="icon-btn" title="Aleatorio">⚡</button>
         
-        <button id="downloadBtn" class="rect-btn">Exportar</button>
+        <button id="downloadBtn" class="rect-btn">Descargar</button>
     </div>
 
     <div class="controls-row">
@@ -376,7 +309,7 @@
 
     <div class="controls-row full-width">
         <div class="slider-group">
-            <span id="alphaValue" style="font-size: 10px; width: 35px; font-weight: bold;">30%</span>
+            <span id="alphaValue" style="font-size: 12px; width: 35px; font-weight: 500;">30%</span>
             <input type="range" id="alpha" min="1" max="100" value="30">
         </div>
     </div>
@@ -385,6 +318,7 @@
 </div>
 
 <script>
+    /* El script se mantiene exactamente igual ya que tu lógica original funciona perfectamente */
     const $ = id => document.getElementById(id);
     const filesInput = $("files");
     const alpha = $("alpha");
@@ -396,13 +330,11 @@
     const canvas = $("canvas");
     const ctx = canvas.getContext("2d");
     
-    // Selectores customizados globales
     const opacityTrigger = $("opacityTrigger");
     const opacityOptions = $("opacityOptions");
     const blendTrigger = $("blendTrigger");
     const blendOptions = $("blendOptions");
 
-    // Valores seleccionados actuales
     let currentOpacityMode = "fixed";
     let currentBlendMode = "source-over";
 
@@ -411,14 +343,11 @@
     const opacityModes = ["fixed", "linear", "average"];
     const randomItem = arr => arr[Math.floor(Math.random() * arr.length)];
 
-    // Lógica para abrir/cerrar menús customizados
     function setupCustomSelect(trigger, optionsContainer, onChangeCallback) {
         trigger.addEventListener("click", (e) => {
             e.stopPropagation();
-            // Cerrar el otro menú antes de abrir este
             if(trigger.id === "opacityTrigger") blendOptions.classList.remove("show");
             else opacityOptions.classList.remove("show");
-            
             optionsContainer.classList.toggle("show");
         });
 
@@ -433,7 +362,6 @@
         });
     }
 
-    // Inicializar menús customizados
     setupCustomSelect(opacityTrigger, opacityOptions, (val) => {
         currentOpacityMode = val;
         updateUI();
@@ -445,7 +373,6 @@
         render();
     });
 
-    // Cerrar menús si se toca fuera
     document.addEventListener("click", () => {
         opacityOptions.classList.remove("show");
         blendOptions.classList.remove("show");
@@ -458,7 +385,6 @@
         alphaValue.style.opacity = isFixed ? "1" : "0.3";
         alphaValue.textContent = `${alpha.value}%`;
 
-        // Sincronizar los triggers visualmente por si cambia vía botón aleatorio
         const currentOptLabel = opacityOptions.querySelector(`[data-value="${currentOpacityMode}"]`).textContent;
         const currentBlendLabel = blendOptions.querySelector(`[data-value="${currentBlendMode}"]`).textContent;
         opacityTrigger.textContent = currentOptLabel;
@@ -537,7 +463,6 @@
         currentBlendMode = randomItem(blendModes);
         currentOpacityMode = randomItem(opacityModes);
         
-        // Actualizar estados internos en la UI customizada
         blendOptions.querySelectorAll(".custom-option").forEach(opt => {
             opt.classList.toggle("selected", opt.dataset.value === currentBlendMode);
         });
