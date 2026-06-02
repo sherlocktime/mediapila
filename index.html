@@ -100,7 +100,6 @@
             }
         }
 
-        /* Alineación izquierda unificada para mantener un eje de lectura consistente en móviles */
         button, .file-upload-label {
             font-family: inherit;
             color: var(--text);
@@ -148,7 +147,6 @@
             border: none;
         }
 
-        /* Acción final principal: Destacada mediante opacidad neutra de alto brillo */
         #downloadBtn {
             background: rgba(255, 255, 255, 0.12);
             border-color: var(--border);
@@ -172,19 +170,21 @@
             padding: 0;
         }
 
-        /* Código de color Funcional: Amarillo reservado exclusivamente para herramientas creativas/aleatorias */
-        #randomBtn, #reverseBtn {
+        #randomBtn,
+        #reverseBtn {
             color: var(--accent);
             background: var(--accent-bg);
             border-color: rgba(255, 204, 0, 0.2);
         }
 
-        #randomBtn:hover, #reverseBtn:hover {
+        #randomBtn:hover,
+        #reverseBtn:hover {
             background: rgba(255, 204, 0, 0.25);
             border-color: var(--accent);
         }
 
-        #randomBtn:active, #reverseBtn:active {
+        #randomBtn:active,
+        #reverseBtn:active {
             transform: scale(0.93);
         }
 
@@ -243,6 +243,14 @@
             border: 1px solid var(--border);
         }
 
+        .blend-separator {
+            border: 0;
+            border-top: 1px solid #444;
+            opacity: 0.5;
+            margin: 4px 0;
+            padding: 0;
+        }
+
         input[type="range"] {
             -webkit-appearance: none;
             flex: 1;
@@ -288,7 +296,7 @@
 
             <button id="randomBtn" class="icon-btn" title="Aleatorio">⚡</button>
 
-            <button id="downloadBtn" class="rect-btn">Descargar</button>
+            <button id="downloadBtn" class="rect-btn">Descargar Imagen</button>
         </div>
 
         <div class="controls-row">
@@ -307,20 +315,30 @@
                 <button id="blendTrigger" class="custom-select-trigger">Normal</button>
                 <div id="blendOptions" class="custom-options-list">
                     <div class="custom-option selected" data-value="source-over">Normal</div>
-                    <div class="custom-option" data-value="multiply">Oscurecer</div>
-                    <div class="custom-option" data-value="screen">Aclarar</div>
-                    <div class="custom-option" data-value="overlay">Contraste</div>
-                    <div class="custom-option" data-value="lighten">Más claro</div>
-                    <div class="custom-option" data-value="darken">Más oscuro</div>
-                    <div class="custom-option" data-value="difference">Diferencia</div>
+                    <hr class="blend-separator">
+
+                    <div class="custom-option" data-value="darken">Oscurecer</div>
+                    <div class="custom-option" data-value="multiply">Multiplicar</div>
+                    <div class="custom-option" data-value="color-burn">Subexponer color</div>
+                    <hr class="blend-separator">
+
+                    <div class="custom-option" data-value="lighten">Aclarar</div>
+                    <div class="custom-option" data-value="screen">Trama</div>
+                    <div class="custom-option" data-value="color-dodge">Sobreexponer color</div>
+                    <hr class="blend-separator">
+
+                    <div class="custom-option" data-value="overlay">Superponer</div>
                     <div class="custom-option" data-value="soft-light">Luz suave</div>
                     <div class="custom-option" data-value="hard-light">Luz fuerte</div>
+                    <hr class="blend-separator">
+
+                    <div class="custom-option" data-value="difference">Diferencia</div>
                     <div class="custom-option" data-value="exclusion">Exclusión</div>
-                    <div class="custom-option" data-value="color-dodge">Sobreexponer</div>
-                    <div class="custom-option" data-value="color-burn">Subexponer</div>
+                    <hr class="blend-separator">
+
                     <div class="custom-option" data-value="hue">Tono</div>
-                    <div class="custom-option" data-value="color">Color</div>
                     <div class="custom-option" data-value="saturation">Saturación</div>
+                    <div class="custom-option" data-value="color">Color</div>
                     <div class="custom-option" data-value="luminosity">Luminosidad</div>
                 </div>
             </div>
@@ -357,9 +375,13 @@
         let currentBlendMode = "source-over";
         let files = [];
 
-        const blendModes = ["source-over", "multiply", "screen", "overlay", "lighten", "darken", 
-            "difference", "soft-light", "hard-light", "exclusion", "color-dodge", "color-burn", 
-            "hue", "saturation", "color", "luminosity"];
+        const blendModes = [
+            "source-over", "darken", "multiply", "color-burn", 
+            "lighten", "screen", "color-dodge", "overlay", 
+            "soft-light", "hard-light", "difference", "exclusion", 
+            "hue", "saturation", "color", "luminosity"
+        ];
+
         const opacityModes = ["fixed", "linear", "average"];
         const randomItem = arr => arr[Math.floor(Math.random() * arr.length)];
 
@@ -368,7 +390,6 @@
             blendOptions.classList.remove("show");
         }
 
-        /* Controlador central para selectores personalizados nativos */
         function setupCustomSelect(trigger, optionsContainer, onChangeCallback) {
             trigger.addEventListener("click", (e) => {
                 e.stopPropagation();
@@ -401,7 +422,6 @@
             });
         }
 
-        /* Algoritmo de barajado Fisher-Yates para reordenar arrays de forma aleatoria uniforme */
         function shuffle(arr) {
             for (let i = arr.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -409,7 +429,6 @@
             }
         }
 
-        /* Núcleo de procesamiento del Canvas: Dibuja y mezcla de forma destructiva y asíncrona la pila de imágenes */
         async function render() {
             if (!files.length) return;
             status.textContent = "Procesando...";
@@ -417,8 +436,7 @@
             try {
                 const images = await Promise.all(files.map(loadImage));
 
-                /* Optimización de Hardware: Evita el colapso de RAM limitando dimensiones críticas en móviles */
-                const MAX_DIMENSION = 2500;
+                const MAX_DIMENSION = 2500; /* limitar dimensiones */
                 let { width, height } = images[0];
 
                 if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
@@ -440,17 +458,22 @@
 
                 images.forEach((img, i) => {
                     let a = baseAlpha;
+                    
                     if (currentOpacityMode === "linear") {
-                        a = 1 - i / Math.max(1, n - 1);
+                        if (i === 0) {
+                            a = baseAlpha;
+                        } else {
+                            a = baseAlpha * (1 - i / n);
+                        }
                     } else if (currentOpacityMode === "average") {
                         a = 1 / n;
                     }
+                    
                     ctx.globalAlpha = a;
                     ctx.globalCompositeOperation = currentBlendMode;
                     ctx.drawImage(img, 0, 0, width, height);
                 });
 
-                /* Reset estructural del contexto para no corromper futuras operaciones de dibujo */
                 ctx.globalAlpha = 1;
                 ctx.globalCompositeOperation = "source-over";
                 updateStatus();
@@ -480,13 +503,13 @@
             }
             const blendName = blendOptions.querySelector(`[data-value="${currentBlendMode}"]`).textContent;
             const opacityName = opacityOptions.querySelector(`[data-value="${currentOpacityMode}"]`).textContent;
-            status.textContent = `${files.length} imágenes · ${blendName} · ${opacityName}`;
+            status.textContent = `${files.length} imágenes · ${opacityName} · ${blendName}`;
         }
 
         filesInput.addEventListener("change", () => {
             if (filesInput.files.length) {
-                files = [...filesInput.files].sort((a, b) => a.name.localeCompare(b.name, 
-                    undefined, {numeric: true, sensitivity: 'base'}));
+                files = [...filesInput.files].sort((a, b) => a.name.localeCompare(b.name,
+                    undefined, { numeric: true, sensitivity: 'base' }));
                 render();
             }
         });
@@ -494,14 +517,12 @@
         alpha.addEventListener("input", updateUI);
         alpha.addEventListener("change", render);
 
-        /* Herramienta creativa 1 (🔒): Cambia el orden de la pila preservando los parámetros de mezcla manuales */
-        reverseBtn.addEventListener("click", () => { 
-            if (!files.length) return; 
+        reverseBtn.addEventListener("click", () => {
+            if (!files.length) return;
             shuffle(files);
             render();
         });
 
-        /* Herramienta creativa 2 (⚡): Modificación caótica total de todas las variables del sistema */
         randomBtn.addEventListener("click", () => {
             if (!files.length) return;
 
@@ -521,16 +542,28 @@
             render();
         });
 
-        /* El timeout asíncrono previene el bloqueo del hilo principal de UI, permitiendo pintar el cambio de texto */
         downloadBtn.addEventListener("click", () => {
             if (!canvas.width) return;
             status.textContent = "Preparando descarga...";
 
             setTimeout(() => {
+                const exportCanvas = document.createElement("canvas");
+                exportCanvas.width = canvas.width;
+                exportCanvas.height = canvas.height;
+                const exportCtx = exportCanvas.getContext("2d");
+
+                exportCtx.fillStyle = "#000000"; /* dibujar sobre un lienzo negro */
+                exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+                exportCtx.globalAlpha = 1.0;
+                exportCtx.globalCompositeOperation = "source-over";
+                exportCtx.drawImage(canvas, 0, 0);
+
                 const a = document.createElement("a");
-                a.download = `pila-${Date.now()}.png`; 
-                a.href = canvas.toDataURL("image/png");
+                a.download = `pila-${Date.now()}.png`;
+                a.href = exportCanvas.toDataURL("image/png");
                 a.click();
+                
                 updateStatus();
             }, 50);
         });
