@@ -315,6 +315,13 @@
                     <div class="custom-option" data-value="difference">Diferencia</div>
                     <div class="custom-option" data-value="soft-light">Luz suave</div>
                     <div class="custom-option" data-value="hard-light">Luz fuerte</div>
+                    <div class="custom-option" data-value="exclusion">Exclusión</div>
+                    <div class="custom-option" data-value="color-dodge">Sobreexponer</div>
+                    <div class="custom-option" data-value="color-burn">Subexponer</div>
+                    <div class="custom-option" data-value="hue">Tono</div>
+                    <div class="custom-option" data-value="color">Color</div>
+                    <div class="custom-option" data-value="saturation">Saturación</div>
+                    <div class="custom-option" data-value="luminosity">Luminosidad</div>
                 </div>
             </div>
         </div>
@@ -350,7 +357,9 @@
         let currentBlendMode = "source-over";
         let files = [];
 
-        const blendModes = ["source-over", "multiply", "screen", "overlay", "lighten", "darken", "difference", "soft-light", "hard-light"];
+        const blendModes = ["source-over", "multiply", "screen", "overlay", "lighten", "darken", 
+            "difference", "soft-light", "hard-light", "exclusion", "color-dodge", "color-burn", 
+            "hue", "saturation", "color", "luminosity"];
         const opacityModes = ["fixed", "linear", "average"];
         const randomItem = arr => arr[Math.floor(Math.random() * arr.length)];
 
@@ -476,7 +485,8 @@
 
         filesInput.addEventListener("change", () => {
             if (filesInput.files.length) {
-                files = [...filesInput.files];
+                files = [...filesInput.files].sort((a, b) => a.name.localeCompare(b.name, 
+                    undefined, {numeric: true, sensitivity: 'base'}));
                 render();
             }
         });
