@@ -196,7 +196,7 @@
             try {
                 const images = await Promise.all(files.map(loadImage));
                 const isMobileDevice = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-                const MAX_DIMENSION = isMobileDevice ? 1400 : 2500; // Limitar DIMENSIONES de imagen para Celular / PC
+                const MAX_DIMENSION = isMobileDevice ? 1600 : 3000; // Limitar DIMENSIONES de imagen para Celular / PC
 
                 let { width, height } = images[0];
 
