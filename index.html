@@ -1,120 +1,318 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pila de Fotos</title>
-    <link rel="manifest" href="./manifest.json"><meta name="theme-color" content="#121212">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link class="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#121212">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        :root{--bg:#000000;--panel-bg:rgba(20,20,20,0.75);--surface-menu:#1c1c1e;--border:rgba(255,255,255,0.08);--accent:#ffcc00;--accent-bg:rgba(255,204,0,0.15);--text:#ffffff;--muted:#8e8e93;--btn-bg:rgba(255,255,255,0.08);--btn-hover:rgba(255,255,255,0.15);--font-main:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-        body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font-main);height:100dvh;display:flex;flex-direction:column;overflow:hidden}
-        h1{padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px;margin:0;font-size:1rem;font-weight:600;text-align:center;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.5);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
-        #canvas-container{flex:1;display:flex;justify-content:center;align-items:center;padding:16px;min-height:0}
-        #canvas-container canvas{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.7)}
-        .control-panel{background:var(--panel-bg);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-top:1px solid var(--border);padding:16px 16px calc(12px + env(safe-area-inset-bottom,12px));display:flex;flex-direction:column;gap:12px;box-shadow:0 -8px 32px rgba(0,0,0,0.4)}
-        .controls-row{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;width:100%;max-width:500px;margin:0 auto}
-        .controls-row.full-width{grid-template-columns:1fr}
-        button,.file-upload-label{font-family:inherit;color:var(--text);background:var(--btn-bg);border:1px solid var(--border);height:46px;border-radius:10px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:flex-start;padding:0 14px;cursor:pointer;user-select:none;transition:background 0.15s ease,transform 0.1s ease}
-        button:active,.file-upload-label:active{transform:scale(0.97);background:var(--btn-hover)}
-        .rect-btn,.file-upload-label,.custom-select-trigger{width:100%;padding-left:14px}
-        .custom-select-trigger{justify-content:space-between}
-        .custom-select-trigger::after{content:"▾";color:var(--muted);font-size:12px}
-        .file-upload-label{background:#ffffff;color:#000000;font-weight:600;border:none}
-        #downloadBtn{background:rgba(255,255,255,0.12);border-color:var(--border);color:var(--text);font-weight:600}
-        #downloadBtn:hover{background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.3)}
-        #files{display:none}
-        button.icon-btn{width:46px;font-size:16px;justify-content:center;padding:0}
-        #randomBtn,#reverseBtn{color:var(--accent);background:var(--accent-bg);border-color:rgba(255,204,0,0.2)}
-        #randomBtn:hover,#reverseBtn:hover{background:rgba(255,204,0,0.25);border-color:var(--accent)}
-        #randomBtn:active,#reverseBtn:active{transform:scale(0.93)}
-        .custom-select-container{position:relative;width:100%}
-        .custom-options-list{position:absolute;bottom:calc(100% + 8px);left:0;right:0;background:var(--surface-menu);border:1px solid var(--border);border-radius:13px;max-height:280px;overflow-y:auto;display:none;z-index:110;box-shadow:0 8px 24px rgba(0,0,0,0.6);padding:4px}
-        .custom-options-list.show{display:block}
-        .custom-option{padding:12px 14px;font-size:14px;border-radius:8px;color:var(--text);cursor:pointer;text-align:left;transition:background 0.1s}
-        .custom-option:active{background:rgba(255,255,255,0.1)}
-        .custom-option.selected{color:var(--accent);background:rgba(255,255,255,0.05)}
-        .slider-group{display:flex;align-items:center;gap:14px;width:100%;background:rgba(255,255,255,0.04);padding:10px 16px;border-radius:10px;border:1px solid var(--border)}
-        .blend-separator{border:0;border-top:1px solid #444;opacity:0.5;margin:4px 0;padding:0}
-        input[type="range"]{-webkit-appearance:none;flex:1;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;outline:none}
-        input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;background:#ffffff;cursor:pointer;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.5)}
-        .status-text{font-size:11px;color:var(--muted);text-align:center;padding-top:2px;font-weight:400}
+        :root { --bg: #000000; --panel-bg: rgba(20, 20, 20, 0.75); --surface-menu: #1c1c1e; --border: rgba(255, 255, 255, 0.08); --accent: #ffcc00; --accent-bg: rgba(255, 204, 0, 0.15); --text: #ffffff; --muted: #8e8e93; --btn-bg: rgba(255, 255, 255, 0.08); --btn-hover: rgba(255, 255, 255, 0.15); --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
+        body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--font-main); height: 100dvh; display: flex; flex-direction: column; overflow: hidden }
+        h1 { padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px; margin: 0; font-size: 1rem; font-weight: 600; text-align: center; border-bottom: 1px solid var(--border); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px) }
+        #canvas-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 16px; min-height: 0 }
+        #canvas-container canvas { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7) }
+        .control-panel { background: var(--panel-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-top: 1px solid var(--border); padding: 16px 16px calc(12px + env(safe-area-inset-bottom, 12px)); display: flex; flex-direction: column; gap: 12px; box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4) }
+        .controls-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; width: 100%; max-width: 500px; margin: 0 auto }
+        .controls-row.full-width { grid-template-columns: 1fr }
+        button, .file-upload-label { font-family: inherit; color: var(--text); background: var(--btn-bg); border: 1px solid var(--border); height: 46px; border-radius: 10px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; justify-content: flex-start; padding: 0 14px; cursor: pointer; user-select: none; transition: background 0.15s ease, transform 0.1s ease }
+        button:active, .file-upload-label:active { transform: scale(0.97); background: var(--btn-hover) }
+        .rect-btn, .file-upload-label, .custom-select-trigger { width: 100%; padding-left: 14px }
+        .custom-select-trigger { justify-content: space-between }
+        .custom-select-trigger::after { content: "▾"; color: var(--muted); font-size: 12px }
+        .file-upload-label { background: #ffffff; color: #000000; font-weight: 600; border: none }
+        #downloadBtn { background: rgba(255, 255, 255, 0.12); border-color: var(--border); color: var(--text); font-weight: 600 }
+        #downloadBtn:hover { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.3) }
+        #files { display: none }
+        button.icon-btn { width: 46px; font-size: 16px; justify-content: center; padding: 0 }
+        #randomBtn, #reverseBtn { color: var(--accent); background: var(--accent-bg); border-color: rgba(255, 204, 0, 0.2) }
+        #randomBtn:hover, #reverseBtn:hover { background: rgba(255, 204, 0, 0.25); border-color: var(--accent) }
+        #randomBtn:active, #reverseBtn:active { transform: scale(0.93) }
+        .custom-select-container { position: relative; width: 100% }
+        .custom-options-list { position: absolute; bottom: calc(100% + 8px); left: 0; right: 0; background: var(--surface-menu); border: 1px solid var(--border); border-radius: 13px; max-height: 280px; overflow-y: auto; display: none; z-index: 110; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); padding: 4px }
+        .custom-options-list.show { display: block }
+        .custom-option { padding: 12px 14px; font-size: 14px; border-radius: 8px; color: var(--text); cursor: pointer; text-align: left; transition: background 0.1s }
+        .custom-option:active { background: rgba(255, 255, 255, 0.1) }
+        .custom-option.selected { color: var(--accent); background: rgba(255, 255, 255, 0.05) }
+        .slider-group { display: flex; align-items: center; gap: 14px; width: 100%; background: rgba(255, 255, 255, 0.04); padding: 10px 16px; border-radius: 10px; border: 1px solid var(--border) }
+        .blend-separator { border: 0; border-top: 1px solid #444; opacity: 0.5; margin: 4px 0; padding: 0 }
+        input[type="range"] { -webkit-appearance: none; flex: 1; height: 4px; background: rgba(255, 255, 255, 0.2); border-radius: 2px; outline: none }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: #ffffff; cursor: pointer; border-radius: 50%; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) }
+        .status-text { font-size: 11px; color: var(--muted); text-align: center; padding-top: 2px; font-weight: 400 }
     </style>
 </head>
+
 <body>
     <h1>Pila de Fotos</h1>
     <div id="canvas-container"><canvas id="canvas"></canvas></div>
+    
     <div class="control-panel">
         <div class="controls-row">
             <label class="file-upload-label">Cargar Fotos<input id="files" type="file" multiple accept="image/*"></label>
             <button id="randomBtn" class="icon-btn" title="Aleatorio">⚡</button>
             <button id="downloadBtn" class="rect-btn">Descargar Imagen</button>
         </div>
+
         <div class="controls-row">
-            <div class="custom-select-container"><button id="opacityTrigger" class="custom-select-trigger">Fija</button><div id="opacityOptions" class="custom-options-list"><div class="custom-option selected" data-value="fixed">Fija</div><div class="custom-option" data-value="linear">Progresiva</div><div class="custom-option" data-value="average">Promedio</div></div></div>
+            <div class="custom-select-container">
+                <button id="opacityTrigger" class="custom-select-trigger">Fija</button>
+                <div id="opacityOptions" class="custom-options-list">
+                    <div class="custom-option selected" data-value="fixed">Fija</div>
+                    <div class="custom-option" data-value="linear">Progresiva</div>
+                    <div class="custom-option" data-value="average">Promedio</div>
+                    <div class="custom-option" data-value="noise">Máscara de Ruido</div>
+                </div>
+            </div>
+            
             <button id="reverseBtn" class="icon-btn" title="Mezclar orden de fotos">🔒</button>
-            <div class="custom-select-container"><button id="blendTrigger" class="custom-select-trigger">Normal</button><div id="blendOptions" class="custom-options-list"><div class="custom-option selected" data-value="source-over">Normal</div><hr class="blend-separator"><div class="custom-option" data-value="darken">Oscurecer</div><div class="custom-option" data-value="multiply">Multiplicar</div><div class="custom-option" data-value="color-burn">Subexponer color</div><hr class="blend-separator"><div class="custom-option" data-value="lighten">Aclarar</div><div class="custom-option" data-value="screen">Trama</div><div class="custom-option" data-value="color-dodge">Sobreexponer color</div><hr class="blend-separator"><div class="custom-option" data-value="overlay">Superponer</div><div class="custom-option" data-value="soft-light">Luz suave</div><div class="custom-option" data-value="hard-light">Luz fuerte</div><hr class="blend-separator"><div class="custom-option" data-value="difference">Diferencia</div><div class="custom-option" data-value="exclusion">Exclusión</div><hr class="blend-separator"><div class="custom-option" data-value="hue">Tono</div><div class="custom-option" data-value="saturation">Saturación</div><div class="custom-option" data-value="color">Color</div><div class="custom-option" data-value="luminosity">Luminosidad</div></div></div>
+            
+            <div class="custom-select-container">
+                <button id="blendTrigger" class="custom-select-trigger">Normal</button>
+                <div id="blendOptions" class="custom-options-list">
+                    <div class="custom-option selected" data-value="source-over">Normal</div>
+                    <hr class="blend-separator">
+                    <div class="custom-option" data-value="darken">Oscurecer</div>
+                    <div class="custom-option" data-value="multiply">Multiplicar</div>
+                    <div class="custom-option" data-value="color-burn">Subexponer color</div>
+                    <hr class="blend-separator">
+                    <div class="custom-option" data-value="lighten">Aclarar</div>
+                    <div class="custom-option" data-value="screen">Trama</div>
+                    <div class="custom-option" data-value="color-dodge">Sobreexponer color</div>
+                    <hr class="blend-separator">
+                    <div class="custom-option" data-value="overlay">Superponer</div>
+                    <div class="custom-option" data-value="soft-light">Luz suave</div>
+                    <div class="custom-option" data-value="hard-light">Luz fuerte</div>
+                    <hr class="blend-separator">
+                    <div class="custom-option" data-value="difference">Diferencia</div>
+                    <div class="custom-option" data-value="exclusion">Exclusión</div>
+                    <hr class="blend-separator">
+                    <div class="custom-option" data-value="hue">Tono</div>
+                    <div class="custom-option" data-value="saturation">Saturación</div>
+                    <div class="custom-option" data-value="color">Color</div>
+                    <div class="custom-option" data-value="luminosity">Luminosidad</div>
+                </div>
+            </div>
         </div>
-        <div class="controls-row full-width"><div class="slider-group"><span id="alphaValue" style="font-size:12px;width:35px;font-weight:500">30%</span><input type="range" id="alpha" min="1" max="100" value="30"></div></div>
+
+        <div class="controls-row full-width">
+            <div class="slider-group">
+                <span id="alphaValue" style="font-size:12px;width:35px;font-weight:500">30%</span>
+                <input type="range" id="alpha" min="1" max="100" value="30">
+            </div>
+        </div>
+        
         <div id="status" class="status-text">Sin imágenes cargadas</div>
     </div>
+
     <script>
         const $ = id => document.getElementById(id);
         const filesInput = $("files"), alpha = $("alpha"), alphaValue = $("alphaValue"), reverseBtn = $("reverseBtn"), randomBtn = $("randomBtn"), downloadBtn = $("downloadBtn"), status = $("status"), canvas = $("canvas"), ctx = canvas.getContext("2d");
         const opacityTrigger = $("opacityTrigger"), opacityOptions = $("opacityOptions"), blendTrigger = $("blendTrigger"), blendOptions = $("blendOptions");
-        let currentOpacityMode = "fixed", currentBlendMode = "source-over", files = [];
-        const blendModes = ["source-over","darken","multiply","color-burn","lighten","screen","color-dodge","overlay","soft-light","hard-light","difference","exclusion","hue","saturation","color","luminosity"];
-        const opacityModes = ["fixed","linear","average"], randomItem = arr => arr[Math.floor(Math.random() * arr.length)];
 
-        function closeAllMenus(){opacityOptions.classList.remove("show");blendOptions.classList.remove("show")}
-        function setupCustomSelect(trigger, optionsContainer, onChangeCallback){
-            trigger.addEventListener("click", e => {e.stopPropagation();const isOpen = optionsContainer.classList.contains("show");closeAllMenus();if(!isOpen)optionsContainer.classList.add("show")});
-            optionsContainer.querySelectorAll(".custom-option").forEach(opt => opt.addEventListener("click", () => {optionsContainer.querySelectorAll(".custom-option").forEach(o => o.classList.remove("selected"));opt.classList.add("selected");trigger.textContent = opt.textContent;optionsContainer.classList.remove("show");onChangeCallback(opt.dataset.value)}));
+        let currentOpacityMode = "fixed", currentBlendMode = "source-over", files = [];
+        let noiseOffsets = [];
+        
+        const blendModes = ["source-over", "darken", "multiply", "color-burn", "lighten", "screen", "color-dodge", "overlay", "soft-light", "hard-light", "difference", "exclusion", "hue", "saturation", "color", "luminosity"];
+        const opacityModes = ["fixed", "linear", "average", "noise"];
+        const randomItem = arr => arr[Math.floor(Math.random() * arr.length)];
+
+        // Precarga de la textura de ruido (Con transparencia nativa)
+        let noiseImage = new Image();
+        let noiseLoaded = false;
+        noiseImage.onload = () => { noiseLoaded = true; render(); };
+        noiseImage.onerror = () => { console.warn("No se pudo cargar 'ruido.png'. Asegúrate de que esté en la misma carpeta."); };
+        noiseImage.src = "ruido.png";
+
+        // Canvas auxiliar en memoria para procesar la máscara
+        const tempCanvas = document.createElement("canvas");
+        const tempCtx = tempCanvas.getContext("2d");
+
+        function generateRandomOffsets() {
+            noiseOffsets = files.map(() => ({
+                x: Math.random() * 1024,
+                y: Math.random() * 1024
+            }));
         }
-        setupCustomSelect(opacityTrigger, opacityOptions, val => {currentOpacityMode = val;updateUI();render()});
-        setupCustomSelect(blendTrigger, blendOptions, val => {currentBlendMode = val;render()});
+
+        function closeAllMenus() { 
+            opacityOptions.classList.remove("show"); 
+            blendOptions.classList.remove("show"); 
+        }
+
+        function setupCustomSelect(trigger, optionsContainer, onChangeCallback) {
+            trigger.addEventListener("click", e => { 
+                e.stopPropagation(); 
+                const isOpen = optionsContainer.classList.contains("show"); 
+                closeAllMenus(); 
+                if (!isOpen) optionsContainer.classList.add("show"); 
+            });
+            
+            optionsContainer.querySelectorAll(".custom-option").forEach(opt => {
+                opt.addEventListener("click", () => { 
+                    optionsContainer.querySelectorAll(".custom-option").forEach(o => o.classList.remove("selected")); 
+                    opt.classList.add("selected"); 
+                    trigger.textContent = opt.textContent; 
+                    optionsContainer.classList.remove("show"); 
+                    onChangeCallback(opt.dataset.value); 
+                });
+            });
+        }
+
+        setupCustomSelect(opacityTrigger, opacityOptions, val => { currentOpacityMode = val; updateUI(); render(); });
+        setupCustomSelect(blendTrigger, blendOptions, val => { currentBlendMode = val; render(); });
         document.addEventListener("click", closeAllMenus);
 
-        function loadImage(file){return new Promise((resolve, reject) => {const img = new Image();img.onload = () => resolve(img);img.onerror = reject;img.src = URL.createObjectURL(file)})}
-        function shuffle(arr){for(let i = arr.length - 1; i > 0; i--){const j = Math.floor(Math.random() * (i + 1));[arr[i], arr[j]] = [arr[j], arr[i]]}}
+        function loadImage(file) { 
+            return new Promise((resolve, reject) => { 
+                const img = new Image(); 
+                img.onload = () => resolve(img); 
+                img.onerror = reject; 
+                img.src = URL.createObjectURL(file); 
+            }); 
+        }
 
-        async function render(){
-            if(!files.length)return;status.textContent = "Procesando...";
-            try{
+        function shuffle(arr) { 
+            for (let i = arr.length - 1; i > 0; i--) { 
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]]; 
+            } 
+        }
+
+        async function render() {
+            if (!files.length) return;
+            if (currentOpacityMode === "noise" && !noiseLoaded) {
+                status.textContent = "Esperando textura de ruido (ruido.png)...";
+                return;
+            }
+            status.textContent = "Procesando...";
+            
+            try {
                 const images = await Promise.all(files.map(loadImage));
-                const MAX_DIMENSION = 2500; // Límite de resolución
-                let {width, height} = images[0];
-                if(width > MAX_DIMENSION || height > MAX_DIMENSION){if(width > height){height *= MAX_DIMENSION / width;width = MAX_DIMENSION}else{width *= MAX_DIMENSION / height;height = MAX_DIMENSION}}
-                canvas.width = width;canvas.height = height;ctx.clearRect(0, 0, width, height);
+                const MAX_DIMENSION = 2500;
+                let { width, height } = images[0];
+                
+                if (width > MAX_DIMENSION || height > MAX_DIMENSION) { 
+                    if (width > height) { height *= MAX_DIMENSION / width; width = MAX_DIMENSION; } 
+                    else { width *= MAX_DIMENSION / height; height = MAX_DIMENSION; } 
+                }
+
+                canvas.width = width; canvas.height = height; ctx.clearRect(0, 0, width, height);
+                tempCanvas.width = width; tempCanvas.height = height;
+
                 const baseAlpha = alpha.value / 100, n = images.length;
+
                 images.forEach((img, i) => {
-                    let a = baseAlpha;
-                    if(currentOpacityMode === "linear")a = i === 0 ? baseAlpha : baseAlpha * (1 - i / n);
-                    else if(currentOpacityMode === "average")a = 1 / n;
-                    ctx.globalAlpha = a;ctx.globalCompositeOperation = currentBlendMode;ctx.drawImage(img, 0, 0, width, height);
+                    // El modo ruido es bastante más complejo
+                    if (currentOpacityMode === "noise") {
+                        tempCtx.clearRect(0, 0, width, height);
+                        tempCtx.globalAlpha = 1.0;
+                        tempCtx.globalCompositeOperation = "source-over";
+                        const offsetX = noiseOffsets[i] ? noiseOffsets[i].x : 0;
+                        const offsetY = noiseOffsets[i] ? noiseOffsets[i].y : 0;
+                        const pattern = tempCtx.createPattern(noiseImage, "repeat");
+                        if (pattern && 'setTransform' in pattern) {
+                            const matrix = new DOMMatrix();
+                            pattern.setTransform(matrix.translate(offsetX, offsetY));
+                        }
+                        tempCtx.fillStyle = pattern;
+                        tempCtx.fillRect(0, 0, width, height);
+                        tempCtx.globalCompositeOperation = "destination-over";
+                        tempCtx.globalAlpha = 1 - baseAlpha; 
+                        tempCtx.fillStyle = "#ffffff"; 
+                        tempCtx.fillRect(0, 0, width, height);
+                        tempCtx.globalAlpha = 1.0;
+                        tempCtx.globalCompositeOperation = "source-in";
+                        tempCtx.drawImage(img, 0, 0, width, height);
+                        ctx.globalAlpha = 1.0; 
+                        ctx.globalCompositeOperation = currentBlendMode;
+                        ctx.drawImage(tempCanvas, 0, 0);
+
+                    } else {
+                        // Modos tradicionales (Fija, Progresiva, Promedio)
+                        let a = baseAlpha;
+                        if (currentOpacityMode === "linear") a = i === 0 ? baseAlpha : baseAlpha * (1 - i / n);
+                        else if (currentOpacityMode === "average") a = 1 / n;
+
+                        ctx.globalAlpha = a;
+                        ctx.globalCompositeOperation = currentBlendMode;
+                        ctx.drawImage(img, 0, 0, width, height);
+                    }
                 });
-                ctx.globalAlpha = 1;ctx.globalCompositeOperation = "source-over";updateStatus();
-            }catch(e){console.error(e);status.textContent = "Error al procesar imágenes"}
+
+                ctx.globalAlpha = 1; ctx.globalCompositeOperation = "source-over"; updateStatus();
+            } catch (e) { 
+                console.error(e); 
+                status.textContent = "Error al procesar imágenes"; 
+            }
         }
 
-        function updateUI(){
-            const isFixed = currentOpacityMode === "fixed";
-            alpha.disabled = !isFixed;alpha.style.opacity = isFixed ? "1" : "0.3";alphaValue.style.opacity = isFixed ? "1" : "0.3";alphaValue.textContent = `${alpha.value}%`;
+        function updateUI() {
+            const allowsAlpha = currentOpacityMode === "fixed" || currentOpacityMode === "noise";
+            alpha.disabled = !allowsAlpha;
+            alpha.style.opacity = allowsAlpha ? "1" : "0.3";
+            alphaValue.style.opacity = allowsAlpha ? "1" : "0.3";
+            alphaValue.textContent = `${alpha.value}%`;
+
             const opacityOpt = opacityOptions.querySelector(`[data-value="${currentOpacityMode}"]`), blendOpt = blendOptions.querySelector(`[data-value="${currentBlendMode}"]`);
-            if(opacityOpt)opacityTrigger.textContent = opacityOpt.textContent;if(blendOpt)blendTrigger.textContent = blendOpt.textContent;
+            if (opacityOpt) opacityTrigger.textContent = opacityOpt.textContent; 
+            if (blendOpt) blendTrigger.textContent = blendOpt.textContent;
         }
-        function updateStatus(){
-            if(!files.length){status.textContent = "Sin imágenes cargadas";return}
-            const blendName = blendOptions.querySelector(`[data-value="${currentBlendMode}"]`).textContent, opacityName = opacityOptions.querySelector(`[data-value="${currentOpacityMode}"]`).textContent;
+
+        function updateStatus() {
+            if (!files.length) { status.textContent = "Sin imágenes cargadas"; return; }
+            const blendName = blendOptions.querySelector(`[data-value="${currentBlendMode}"]`).textContent;
+            const opacityName = opacityOptions.querySelector(`[data-value="${currentOpacityMode}"]`).textContent;
             status.textContent = `${files.length} imágenes · ${opacityName} · ${blendName}`;
         }
 
-        filesInput.addEventListener("change", () => {if(filesInput.files.length){files = [...filesInput.files].sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true, sensitivity: 'base'}));render()}});
-        alpha.addEventListener("input", updateUI);alpha.addEventListener("change", render);
-        reverseBtn.addEventListener("click", () => {if(!files.length)return;shuffle(files);render()});
-        randomBtn.addEventListener("click", () => {if(!files.length)return;currentBlendMode = randomItem(blendModes);currentOpacityMode = randomItem(opacityModes);blendOptions.querySelectorAll(".custom-option").forEach(opt => opt.classList.toggle("selected", opt.dataset.value === currentBlendMode));opacityOptions.querySelectorAll(".custom-option").forEach(opt => opt.classList.toggle("selected", opt.dataset.value === currentOpacityMode));alpha.value = Math.floor(Math.random() * 100) + 1;updateUI();shuffle(files);render()});
-        downloadBtn.addEventListener("click", () => {if(!canvas.width)return;status.textContent = "Preparando descarga...";setTimeout(() => {const exportCanvas = document.createElement("canvas");exportCanvas.width = canvas.width;exportCanvas.height = canvas.height;const exportCtx = exportCanvas.getContext("2d");exportCtx.fillStyle = "#000000";exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);exportCtx.globalAlpha = 1.0;exportCtx.globalCompositeOperation = "source-over";exportCtx.drawImage(canvas, 0, 0);const a = document.createElement("a");a.download = `pila-${Date.now()}.png`;a.href = exportCanvas.toDataURL("image/png");a.click();updateStatus()}, 50)});
+        filesInput.addEventListener("change", () => { 
+            if (filesInput.files.length) { 
+                files = [...filesInput.files].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })); 
+                generateRandomOffsets(); 
+                render(); 
+            } 
+        });
+        
+        alpha.addEventListener("input", updateUI); 
+        alpha.addEventListener("change", render);
+        
+        reverseBtn.addEventListener("click", () => { if (!files.length) return; shuffle(files); generateRandomOffsets(); render(); });
+        
+        randomBtn.addEventListener("click", () => { 
+            if (!files.length) return; 
+            currentBlendMode = randomItem(blendModes); 
+            currentOpacityMode = randomItem(opacityModes); 
+            blendOptions.querySelectorAll(".custom-option").forEach(opt => opt.classList.toggle("selected", opt.dataset.value === currentBlendMode)); 
+            opacityOptions.querySelectorAll(".custom-option").forEach(opt => opt.classList.toggle("selected", opt.dataset.value === currentOpacityMode)); 
+            alpha.value = Math.floor(Math.random() * 100) + 1; 
+            updateUI(); 
+            shuffle(files); 
+            generateRandomOffsets(); 
+            render(); 
+        });
+        
+        downloadBtn.addEventListener("click", () => { 
+            if (!canvas.width) return; 
+            status.textContent = "Preparando descarga..."; 
+            setTimeout(() => { 
+                const exportCanvas = document.createElement("canvas"); 
+                exportCanvas.width = canvas.width; exportCanvas.height = canvas.height; 
+                const exportCtx = exportCanvas.getContext("2d"); 
+                exportCtx.fillStyle = "#000000"; exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height); 
+                exportCtx.drawImage(canvas, 0, 0); 
+                
+                const a = document.createElement("a"); 
+                a.download = `pila-${Date.now()}.jpg`; 
+                a.href = exportCanvas.toDataURL("image/jpeg", 0.95);
+                a.click(); 
+                updateStatus(); 
+            }, 50); 
+        });
+        
         updateUI();
     </script>
 </body>
