@@ -136,7 +136,8 @@
         function generateRandomOffsets() {
             noiseOffsets = files.map(() => ({
                 x: Math.random() * 1024,
-                y: Math.random() * 1024
+                y: Math.random() * 1024,
+                scale: 1 + Math.random() * 9 // Escala aleatoria del ruido
             }));
         }
 
@@ -216,12 +217,16 @@
                         tempCtx.clearRect(0, 0, width, height);
                         tempCtx.globalAlpha = 1.0;
                         tempCtx.globalCompositeOperation = "source-over";
+
                         const offsetX = noiseOffsets[i] ? noiseOffsets[i].x : 0;
                         const offsetY = noiseOffsets[i] ? noiseOffsets[i].y : 0;
+                        const noiseScale = noiseOffsets[i] ? noiseOffsets[i].scale : 1.0;
+
                         const pattern = tempCtx.createPattern(noiseImage, "repeat");
                         if (pattern && 'setTransform' in pattern) {
                             const matrix = new DOMMatrix();
-                            pattern.setTransform(matrix.translate(offsetX, offsetY));
+                            const noiseScale = 1.5;
+                            pattern.setTransform(matrix.translate(offsetX, offsetY).scale(noiseScale));
                         }
                         tempCtx.fillStyle = pattern;
                         tempCtx.fillRect(0, 0, width, height);
