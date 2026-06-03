@@ -64,7 +64,7 @@
                     <div class="custom-option selected" data-value="fixed">Fija</div>
                     <div class="custom-option" data-value="linear">Progresiva</div>
                     <div class="custom-option" data-value="average">Promedio</div>
-                    <div class="custom-option" data-value="noise">Máscara de Ruido</div>
+                    <!-- <div class="custom-option" data-value="noise">Máscara de Ruido</div> -->
                 </div>
             </div>
             
@@ -117,19 +117,19 @@
         let noiseOffsets = [];
         
         const blendModes = ["source-over", "darken", "multiply", "color-burn", "lighten", "screen", "color-dodge", "overlay", "soft-light", "hard-light", "difference", "exclusion", "hue", "saturation", "color", "luminosity"];
-        const opacityModes = ["fixed", "linear", "average", "noise"];
+        const opacityModes = ["fixed", "linear", "average"]; // , "noise" (desactivo porque es un poco pesado para celulares)
         const randomItem = arr => arr[Math.floor(Math.random() * arr.length)];
 
-        // Precarga de la textura de ruido (Con transparencia nativa)
-        let noiseImage = new Image();
-        let noiseLoaded = false;
-        noiseImage.onload = () => { noiseLoaded = true; render(); };
-        noiseImage.onerror = () => { console.warn("No se pudo cargar 'ruido.png'. Asegúrate de que esté en la misma carpeta."); };
-        noiseImage.src = "ruido.png";
+        // // Precarga de la textura de ruido (Con transparencia nativa)
+        // let noiseImage = new Image();
+        // let noiseLoaded = false;
+        // noiseImage.onload = () => { noiseLoaded = true; render(); };
+        // noiseImage.onerror = () => { console.warn("No se pudo cargar 'ruido.png'. Asegúrate de que esté en la misma carpeta."); };
+        // noiseImage.src = "ruido.png";
 
-        // Canvas auxiliar en memoria para procesar la máscara
-        const tempCanvas = document.createElement("canvas");
-        const tempCtx = tempCanvas.getContext("2d");
+        // // Canvas auxiliar en memoria para procesar la máscara
+        // const tempCanvas = document.createElement("canvas");
+        // const tempCtx = tempCanvas.getContext("2d");
 
         function generateRandomOffsets() {
             noiseOffsets = files.map(() => ({
@@ -201,12 +201,12 @@
                 }
 
                 canvas.width = width; canvas.height = height; ctx.clearRect(0, 0, width, height);
-                tempCanvas.width = width; tempCanvas.height = height;
+                // tempCanvas.width = width; tempCanvas.height = height;
 
                 const baseAlpha = alpha.value / 100, n = images.length;
 
                 images.forEach((img, i) => {
-                    // El modo ruido es bastante más complejo
+                    // El modo ruido es bastante más complejo, no lo uso x ahora
                     if (currentOpacityMode === "noise") {
                         tempCtx.clearRect(0, 0, width, height);
                         tempCtx.globalAlpha = 1.0;
