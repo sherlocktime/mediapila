@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pila de Fotos</title>
     <link class="apple-touch-icon" href="icon-192.png">
-    <link rel="manifest" href="./manifest.json">
+    <link class="manifest" href="./manifest.json">
     <meta name="theme-color" content="#121212">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -66,7 +66,8 @@
                     <div class="custom-option selected" data-value="fixed">Fija</div>
                     <div class="custom-option" data-value="linear">Progresiva</div>
                     <div class="custom-option" data-value="average">Promedio</div>
-                    <div class="custom-option" data-value="noise">Ruido (más lento)</div>
+                    <div class="custom-option" data-value="noise_A">Ruido</div>
+                    <div class="custom-option" data-value="noise_B">Bandas</div>
                 </div>
             </div>
 
@@ -119,17 +120,16 @@
         let noiseOffsets = [];
 
         const blendModes = ["source-over", "darken", "multiply", "color-burn", "lighten", "screen", "color-dodge", "overlay", "soft-light", "hard-light", "difference", "exclusion", "hue", "saturation", "color", "luminosity"];
-        const opacityModes = ["fixed", "linear", "average", "noise"];
+        const opacityModes = ["fixed", "linear", "average", "noise_A", "noise_B"];
         const randomItem = arr => arr[Math.floor(Math.random() * arr.length)];
 
-        // Precarga de la textura de ruido (Con transparencia nativa) - servir página..!
+        // Un solo objeto Image reactivo y limpio
         let noiseImage = new Image();
-        let noiseLoaded = false;
-        noiseImage.onload = () => { noiseLoaded = true; render(); };
-        noiseImage.onerror = () => { console.warn("No se pudo cargar 'ruido.png'."); };
-        noiseImage.src = "ruido.png";
+        
+        // Cada vez que cambie el src del ruido (sea A o B) y complete la carga, renderiza automáticamente
+        noiseImage.onload = () => { render(); };
+        noiseImage.onerror = () => { console.warn(`No se pudo cargar la textura de ruido.`); };
 
-        // Canvas auxiliar en memoria para procesar la máscara
         const tempCanvas = document.createElement("canvas");
         const tempCtx = tempCanvas.getContext("2d");
 
@@ -137,7 +137,7 @@
             noiseOffsets = files.map(() => ({
                 x: Math.random() * 1024,
                 y: Math.random() * 1024,
-                scale: 1 + Math.random() * 14 // Escala aleatoria del ruido
+                scale: 1 + Math.random() * 14 
             }));
         }
 
@@ -165,7 +165,16 @@
             });
         }
 
-        setupCustomSelect(opacityTrigger, opacityOptions, val => { currentOpacityMode = val; updateUI(); render(); });
+        // Al cambiar el modo de opacidad, si es ruido, le asignamos la nueva ruta al vuelo
+        setupCustomSelect(opacityTrigger, opacityOptions, val => { 
+            currentOpacityMode = val; 
+            updateUI(); 
+            
+            if (currentOpacityMode === "noise_A") noiseImage.src = "ruido_A.png";
+            else if (currentOpacityMode === "noise_B") noiseImage.src = "ruido_B.png";
+            else render(); // Si es un modo tradicional, renderiza directo
+        });
+        
         setupCustomSelect(blendTrigger, blendOptions, val => { currentBlendMode = val; render(); });
         document.addEventListener("click", closeAllMenus);
 
@@ -187,17 +196,17 @@
 
         async function render() {
             if (!files.length) return;
-            if (currentOpacityMode === "noise" && !noiseLoaded) {
-                status.textContent = "Esperando textura de ruido (ruido.png)...";
-                return;
-            }
+
+            // Si está seleccionado un modo de ruido pero la imagen aún no cargó su ruta actual, esperamos
+            if (currentOpacityMode === "noise_A" && !noiseImage.src.includes("ruido_A.png")) return;
+            if (currentOpacityMode === "noise_B" && !noiseImage.src.includes("ruido_B.png")) return;
 
             status.textContent = "Procesando...";
 
             try {
                 const images = await Promise.all(files.map(loadImage));
                 const isMobileDevice = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-                const MAX_DIMENSION = isMobileDevice ? 1600 : 3000; // Limitar DIMENSIONES de imagen para Celular / PC
+                const MAX_DIMENSION = isMobileDevice ? 1600 : 3000; 
 
                 let { width, height } = images[0];
 
@@ -212,8 +221,7 @@
                 const baseAlpha = alpha.value / 100, n = images.length;
 
                 images.forEach((img, i) => {
-                    // El modo ruido es bastante más complejo
-                    if (currentOpacityMode === "noise") {
+                    if (currentOpacityMode.startsWith("noise_")) {
                         tempCtx.clearRect(0, 0, width, height);
                         tempCtx.globalAlpha = 1.0;
                         tempCtx.globalCompositeOperation = "source-over";
@@ -222,6 +230,7 @@
                         const offsetY = noiseOffsets[i] ? noiseOffsets[i].y : 0;
                         const noiseScale = noiseOffsets[i] ? noiseOffsets[i].scale : 1.0;
 
+                        // Se genera el patrón directamente con la textura que tenga asignada noiseImage
                         const pattern = tempCtx.createPattern(noiseImage, "repeat");
                         if (pattern && 'setTransform' in pattern) {
                             const matrix = new DOMMatrix();
@@ -241,7 +250,6 @@
                         ctx.drawImage(tempCanvas, 0, 0);
 
                     } else {
-                        // Modos tradicionales (Fija, Progresiva, Promedio)
                         let a = baseAlpha;
                         if (currentOpacityMode === "linear") a = i === 0 ? baseAlpha : baseAlpha * (1 - i / n);
                         else if (currentOpacityMode === "average") a = 1 / n;
@@ -260,7 +268,7 @@
         }
 
         function updateUI() {
-            const allowsAlpha = currentOpacityMode === "fixed" || currentOpacityMode === "noise";
+            const allowsAlpha = currentOpacityMode === "fixed" || currentOpacityMode.startsWith("noise_");
             alpha.disabled = !allowsAlpha;
             alpha.style.opacity = allowsAlpha ? "1" : "0.3";
             alphaValue.style.opacity = allowsAlpha ? "1" : "0.3";
@@ -301,7 +309,11 @@
             updateUI();
             shuffle(files);
             generateRandomOffsets();
-            render();
+            
+            // Si el random elige un ruido, actualiza la ruta antes de renderizar
+            if (currentOpacityMode === "noise_A") noiseImage.src = "ruido_A.png";
+            else if (currentOpacityMode === "noise_B") noiseImage.src = "ruido_B.png";
+            else render();
         });
 
         downloadBtn.addEventListener("click", () => {
@@ -322,6 +334,8 @@
             }, 50);
         });
 
+        // Carga inicial por defecto
+        noiseImage.src = "ruido_A.png";
         updateUI();
     </script>
 </body>
