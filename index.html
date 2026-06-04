@@ -225,7 +225,6 @@
                         const pattern = tempCtx.createPattern(noiseImage, "repeat");
                         if (pattern && 'setTransform' in pattern) {
                             const matrix = new DOMMatrix();
-                            const noiseScale = 1.5;
                             pattern.setTransform(matrix.translate(offsetX, offsetY).scale(noiseScale));
                         }
                         tempCtx.fillStyle = pattern;
