@@ -11,271 +11,39 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        :root {
-            --bg: #000000;
-            --panel-bg: rgba(20, 20, 20, 0.75);
-            --surface-menu: #1c1c1e;
-            --border: rgba(255, 255, 255, 0.08);
-            --accent: #ffcc00;
-            --accent-bg: rgba(255, 204, 0, 0.15);
-            --text: #ffffff;
-            --muted: #8e8e93;
-            --btn-bg: rgba(255, 255, 255, 0.08);
-            --btn-hover: rgba(255, 255, 255, 0.15);
-            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--font-main);
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden
-        }
-
-        h1 {
-            padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
-            margin: 0;
-            font-size: 1rem;
-            font-weight: 600;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px)
-        }
-
-        #canvas-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-            min-height: 0
-        }
-
-        #canvas-container canvas {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 12px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7)
-        }
-
-        .control-panel {
-            background: var(--panel-bg);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border-top: 1px solid var(--border);
-            padding: 16px 16px calc(12px + env(safe-area-inset-bottom, 12px));
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4)
-        }
-
-        .controls-row {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 10px;
-            align-items: center;
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto
-        }
-
-        .controls-row.full-width {
-            grid-template-columns: 1fr
-        }
-
-        button,
-        .file-upload-label {
-            font-family: inherit;
-            color: var(--text);
-            background: var(--btn-bg);
-            border: 1px solid var(--border);
-            height: 46px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 0 14px;
-            cursor: pointer;
-            user-select: none;
-            transition: background 0.15s ease, transform 0.1s ease
-        }
-
-        button:active,
-        .file-upload-label:active {
-            transform: scale(0.97);
-            background: var(--btn-hover)
-        }
-
-        .rect-btn,
-        .file-upload-label,
-        .custom-select-trigger {
-            width: 100%;
-            padding-left: 14px
-        }
-
-        .custom-select-trigger {
-            justify-content: space-between
-        }
-
-        .custom-select-trigger::after {
-            content: "▾";
-            color: var(--muted);
-            font-size: 12px
-        }
-
-        .file-upload-label {
-            background: #ffffff;
-            color: #000000;
-            font-weight: 600;
-            border: none
-        }
-
-        #downloadBtn {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: var(--border);
-            color: var(--text);
-            font-weight: 600
-        }
-
-        #downloadBtn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3)
-        }
-
-        #files {
-            display: none
-        }
-
-        button.icon-btn {
-            width: 46px;
-            font-size: 16px;
-            justify-content: center;
-            padding: 0
-        }
-
-        #randomBtn,
-        #reverseBtn {
-            color: var(--accent);
-            background: var(--accent-bg);
-            border-color: rgba(255, 204, 0, 0.2)
-        }
-
-        #randomBtn:hover,
-        #reverseBtn:hover {
-            background: rgba(255, 204, 0, 0.25);
-            border-color: var(--accent)
-        }
-
-        #randomBtn:active,
-        #reverseBtn:active {
-            transform: scale(0.93)
-        }
-
-        .custom-select-container {
-            position: relative;
-            width: 100%
-        }
-
-        .custom-options-list {
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 0;
-            right: 0;
-            background: var(--surface-menu);
-            border: 1px solid var(--border);
-            border-radius: 13px;
-            max-height: 280px;
-            overflow-y: auto;
-            display: none;
-            z-index: 110;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-            padding: 4px
-        }
-
-        .custom-options-list.show {
-            display: block
-        }
-
-        .custom-option {
-            padding: 12px 14px;
-            font-size: 14px;
-            border-radius: 8px;
-            color: var(--text);
-            cursor: pointer;
-            text-align: left;
-            transition: background 0.1s
-        }
-
-        .custom-option:active {
-            background: rgba(255, 255, 255, 0.1)
-        }
-
-        .custom-option.selected {
-            color: var(--accent);
-            background: rgba(255, 255, 255, 0.05)
-        }
-
-        .slider-group {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.04);
-            padding: 10px 16px;
-            border-radius: 10px;
-            border: 1px solid var(--border)
-        }
-
-        .blend-separator {
-            border: 0;
-            border-top: 1px solid #444;
-            opacity: 0.5;
-            margin: 4px 0;
-            padding: 0
-        }
-
-        input[type="range"] {
-            -webkit-appearance: none;
-            flex: 1;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
-            outline: none
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
-            background: #ffffff;
-            cursor: pointer;
-            border-radius: 50%;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5)
-        }
-
-        .status-text {
-            font-size: 11px;
-            color: var(--muted);
-            text-align: center;
-            padding-top: 2px;
-            font-weight: 400
-        }
+        :root { --bg: #000000; --panel-bg: rgba(20, 20, 20, 0.75); --surface-menu: #1c1c1e; --border: rgba(255, 255, 255, 0.08); --accent: #ffcc00; --accent-bg: rgba(255, 204, 0, 0.15); --text: #ffffff; --muted: #8e8e93; --btn-bg: rgba(255, 255, 255, 0.08); --btn-hover: rgba(255, 255, 255, 0.15); --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
+        body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--font-main); height: 100dvh; display: flex; flex-direction: column; overflow: hidden }
+        h1 { padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px; margin: 0; font-size: 1rem; font-weight: 600; text-align: center; border-bottom: 1px solid var(--border); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px) }
+        #canvas-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 16px; min-height: 0 }
+        #canvas-container canvas { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7) }
+        .control-panel { background: var(--panel-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-top: 1px solid var(--border); padding: 16px 16px calc(12px + env(safe-area-inset-bottom, 12px)); display: flex; flex-direction: column; gap: 12px; box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4) }
+        .controls-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; width: 100%; max-width: 500px; margin: 0 auto }
+        .controls-row.full-width { grid-template-columns: 1fr }
+        button, .file-upload-label { font-family: inherit; color: var(--text); background: var(--btn-bg); border: 1px solid var(--border); height: 46px; border-radius: 10px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; justify-content: flex-start; padding: 0 14px; cursor: pointer; user-select: none; transition: background 0.15s, transform 0.1s }
+        button:active, .file-upload-label:active { transform: scale(0.97); background: var(--btn-hover) }
+        .rect-btn, .file-upload-label, .custom-select-trigger { width: 100%; padding-left: 14px }
+        .custom-select-trigger { justify-content: space-between }
+        .custom-select-trigger::after { content: "▾"; color: var(--muted); font-size: 12px }
+        .file-upload-label { background: #ffffff; color: #000000; font-weight: 600; border: none }
+        #downloadBtn { background: rgba(255, 255, 255, 0.12); border-color: var(--border); color: var(--text); font-weight: 600 }
+        #downloadBtn:hover { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.3) }
+        #files { display: none }
+        button.icon-btn { width: 46px; font-size: 16px; justify-content: center; padding: 0 }
+        #randomBtn, #reverseBtn { color: var(--accent); background: var(--accent-bg); border-color: rgba(255, 204, 0, 0.2) }
+        #randomBtn:hover, #reverseBtn:hover { background: rgba(255, 204, 0, 0.25); border-color: var(--accent) }
+        #randomBtn:active, #reverseBtn:active { transform: scale(0.93) }
+        .custom-select-container { position: relative; width: 100% }
+        .custom-options-list { position: absolute; bottom: calc(100% + 8px); left: 0; right: 0; background: var(--surface-menu); border: 1px solid var(--border); border-radius: 13px; max-height: 280px; overflow-y: auto; display: none; z-index: 110; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); padding: 4px }
+        .custom-options-list.show { display: block }
+        .custom-option { padding: 12px 14px; font-size: 14px; border-radius: 8px; color: var(--text); cursor: pointer; text-align: left; transition: background 0.1s }
+        .custom-option:active { background: rgba(255, 255, 255, 0.1) }
+        .custom-option.selected { color: var(--accent); background: rgba(255, 255, 255, 0.05) }
+        .slider-group { display: flex; align-items: center; gap: 14px; width: 100%; background: rgba(255, 255, 255, 0.04); padding: 10px 16px; border-radius: 10px; border: 1px solid var(--border) }
+        .blend-separator { border: 0; border-top: 1px solid #444; opacity: 0.5; margin: 4px 0; padding: 0 }
+        input[type="range"] { -webkit-appearance: none; flex: 1; height: 4px; background: rgba(255, 255, 255, 0.2); border-radius: 2px; outline: none }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: #ffffff; cursor: pointer; border-radius: 50%; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) }
+        .status-text { font-size: 11px; color: var(--muted); text-align: center; padding-top: 2px; font-weight: 400 }
     </style>
 </head>
 
@@ -285,8 +53,7 @@
 
     <div class="control-panel">
         <div class="controls-row">
-            <label class="file-upload-label">Cargar Fotos<input id="files" type="file" multiple
-                    accept="image/*"></label>
+            <label class="file-upload-label">Cargar Fotos<input id="files" type="file" multiple accept="image/*"></label>
             <button id="randomBtn" class="icon-btn" title="Aleatorio">⚡</button>
             <button id="downloadBtn" class="rect-btn">Descargar Imagen</button>
         </div>
@@ -351,10 +118,6 @@
         let currentOpacityMode = "fixed", currentBlendMode = "source-over", files = [];
         let noiseOffsets = [];
 
-        // const blendModes = ["source-over", "darken", "multiply", "color-burn", "lighten", "screen", "color-dodge", "overlay", "soft-light", "hard-light", "difference", "exclusion", "hue", "saturation", "color", "luminosity"];
-        // const opacityModes = ["fixed", "linear", "average", "noise_A", "noise_B"];
-
-        // lista CORTA para el botón de aleatorizar
         const blendModes = ["source-over", "darken", "multiply", "lighten", "screen", "color-dodge", "overlay", "soft-light", "hard-light", "color", "luminosity"];
         const opacityModes = ["fixed", "fixed", "linear", "noise_A", "noise_B"];
 
@@ -362,7 +125,6 @@
 
         let noiseImage = new Image();
         noiseImage.onload = () => { render(); };
-        noiseImage.onerror = () => { console.warn(`No se pudo cargar la textura de ruido.`); };
 
         const tempCanvas = document.createElement("canvas");
         const tempCtx = tempCanvas.getContext("2d");
@@ -402,10 +164,9 @@
         setupCustomSelect(opacityTrigger, opacityOptions, val => {
             currentOpacityMode = val;
             updateUI();
-
             if (currentOpacityMode === "noise_A") noiseImage.src = "ruido_A.png";
             else if (currentOpacityMode === "noise_B") noiseImage.src = "ruido_B.png";
-            else render(); // Si es un modo tradicional, renderiza directo
+            else render();
         });
 
         setupCustomSelect(blendTrigger, blendOptions, val => { currentBlendMode = val; render(); });
@@ -427,8 +188,18 @@
             }
         }
 
-        async function render() {
+        function getAdaptiveBgColor(mode) { // decidir de qué color pintamos el lienzo antes de apilar...
+            const darkModes = ["multiply"];
+            const lightModes = ["screen", "lighten", "exclusion"];
+            const alphaModes = ["hue", "saturation", "color", "color-dodge", "color-burn"];
+            
+            if (darkModes.includes(mode)) return "#ffffff"; // Blanco
+            if (lightModes.includes(mode)) return "#000000"; // Negro
+            if (alphaModes.includes(mode)) return "#0000"; // Alfa
+            return "#808080"; // Gris
+        }
 
+        async function render() {
             if (!files.length) return;
             if (currentOpacityMode === "noise_A" && !noiseImage.src.includes("ruido_A.png")) return;
             if (currentOpacityMode === "noise_B" && !noiseImage.src.includes("ruido_B.png")) return;
@@ -446,8 +217,13 @@
                     else { width *= MAX_DIMENSION / height; height = MAX_DIMENSION; }
                 }
 
-                canvas.width = width; canvas.height = height; ctx.clearRect(0, 0, width, height);
+                canvas.width = width; canvas.height = height; 
                 tempCanvas.width = width; tempCanvas.height = height;
+
+                // --- INYECCIÓN DE CAPA BASE ADAPTATIVA ---
+                ctx.clearRect(0, 0, width, height);
+                ctx.fillStyle = getAdaptiveBgColor(currentBlendMode);
+                ctx.fillRect(0, 0, width, height);
 
                 const baseAlpha = alpha.value / 100, n = images.length;
 
