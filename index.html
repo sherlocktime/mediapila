@@ -316,7 +316,7 @@
             currentOpacityMode = randomItem(opacityModes);
             blendOptions.querySelectorAll(".custom-option").forEach(opt => opt.classList.toggle("selected", opt.dataset.value === currentBlendMode));
             opacityOptions.querySelectorAll(".custom-option").forEach(opt => opt.classList.toggle("selected", opt.dataset.value === currentOpacityMode));
-            alpha.value = Math.floor(Math.random() * 100) + 1;
+            alpha.value = Math.floor(Math.random() * 90) + 11;
 
             updateUI();
             shuffle(files);
