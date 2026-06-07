@@ -188,15 +188,21 @@
             }
         }
 
-        function getAdaptiveBgColor(mode) { // decidir de qué color pintamos el lienzo antes de apilar...
-            const darkModes = ["multiply"];
-            const lightModes = ["screen", "lighten", "exclusion"];
-            const alphaModes = ["hue", "saturation", "color", "color-dodge", "color-burn"];
+        // function getAdaptiveBgColor(mode) { // Color del lienzo antes de Apilar...
+        //     const darkModes = ["multiply", "color-dodge"];
+        //     const lightModes = ["screen", "lighten", "exclusion"];
+        //     const alphaModes = ["hue", "saturation", "color", "color-burn"];
             
-            if (darkModes.includes(mode)) return "#ffffff"; // Blanco
-            if (lightModes.includes(mode)) return "#000000"; // Negro
-            if (alphaModes.includes(mode)) return "#0000"; // Alfa
-            return "#808080"; // Gris
+        //     if (darkModes.includes(mode)) return "#ffffff"; // Blanco
+        //     if (lightModes.includes(mode)) return "#000000"; // Negro
+        //     if (alphaModes.includes(mode)) return "#0000"; // Alfa
+        //     return "#808080"; // Gris por defecto
+        // }
+
+        function getAdaptiveBgColor(mode) { // Versión alternativa aleatoria para experimentar
+            const colors = [ "#ffffff", "#000000", "#0000", "#808080" ];
+            const randomIndex = Math.floor(Math.random() * colors.length);
+            return colors[randomIndex];
         }
 
         async function render() {
