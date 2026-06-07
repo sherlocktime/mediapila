@@ -17,11 +17,14 @@
         h1 { padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px; margin: 0; font-size: 1rem; font-weight: 600; text-align: center; border-bottom: 1px solid var(--border); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px) }
         #canvas-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 16px; min-height: 0; position: relative }
         #canvas-container canvas { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7) }
-        .status-text { position: absolute; top: 24px; left: 24px; font-size: 11px; color: rgba(255, 255, 255, 0.85); background: rgba(0, 0, 0, 0.6); padding: 6px 12px; border-radius: 20px; font-weight: 500; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); z-index: 10; pointer-events: none }
+        
+        /* Línea de estado flotante y perfectamente CENTRADA horizontalmente */
+        .status-text { position: absolute; top: 24px; left: 50%; transform: translateX(-50%); font-size: 11px; color: rgba(255, 255, 255, 0.85); background: rgba(0, 0, 0, 0.6); padding: 6px 12px; border-radius: 20px; font-weight: 500; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); z-index: 10; pointer-events: none; white-space: nowrap }
+        
         .control-panel { background: var(--panel-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-top: 1px solid var(--border); padding: 16px 16px calc(12px + env(safe-area-inset-bottom, 12px)); display: flex; flex-direction: column; gap: 12px; box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4) }
         .controls-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; width: 100%; max-width: 500px; margin: 0 auto }
-        .controls-row.slider-layout { grid-template-columns: 1fr auto }
-        button, .file-upload-label, .bg-select-dropdown { font-family: inherit; color: var(--text); background: var(--btn-bg); border: 1px solid var(--border); height: 46px; border-radius: 10px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; justify-content: flex-start; padding: 0 14px; cursor: pointer; user-select: none; transition: background 0.15s, transform 0.1s }
+        .controls-row.full-width { grid-template-columns: 1fr }
+        button, .file-upload-label { font-family: inherit; color: var(--text); background: var(--btn-bg); border: 1px solid var(--border); height: 46px; border-radius: 10px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; justify-content: flex-start; padding: 0 14px; cursor: pointer; user-select: none; transition: background 0.15s, transform 0.1s }
         button:active, .file-upload-label:active { transform: scale(0.97); background: var(--btn-hover) }
         .rect-btn, .file-upload-label, .custom-select-trigger { width: 100%; padding-left: 14px }
         .custom-select-trigger { justify-content: space-between }
@@ -44,7 +47,6 @@
         .blend-separator { border: 0; border-top: 1px solid #444; opacity: 0.5; margin: 4px 0; padding: 0 }
         input[type="range"] { -webkit-appearance: none; flex: 1; height: 4px; background: rgba(255, 255, 255, 0.2); border-radius: 2px; outline: none }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: #ffffff; cursor: pointer; border-radius: 50%; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) }
-        .bg-select-dropdown { background: var(--surface-menu); font-weight: 500; font-size: 13px; outline: none; padding-right: 28px; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: calc(100% - 10px) center; width: 105px }
     </style>
 </head>
 
@@ -57,14 +59,12 @@
 
     <div class="control-panel">
         <div class="controls-row">
-            <label class="file-upload-label">Cargar Fotos<input id="files" type="file" multiple
-                    accept="image/*"></label>
+            <label class="file-upload-label">Cargar Fotos<input id="files" type="file" multiple accept="image/*"></label>
             <button id="randomBtn" class="icon-btn" title="Aleatorio">⚡</button>
             <button id="downloadBtn" class="rect-btn">Descargar Imagen</button>
         </div>
 
         <div class="controls-row">
-
             <div class="custom-select-container">
                 <button id="blendTrigger" class="custom-select-trigger">Normal</button>
                 <div id="blendOptions" class="custom-options-list">
@@ -104,23 +104,13 @@
                     <div class="custom-option" data-value="noise_B">Bandas</div>
                 </div>
             </div>
-
-
         </div>
 
-        <div class="controls-row slider-layout">
+        <div class="controls-row full-width">
             <div class="slider-group">
                 <span id="alphaValue" style="font-size:12px;width:35px;font-weight:500">30%</span>
                 <input type="range" id="alpha" min="1" max="100" value="30">
             </div>
-
-            <select id="bgColorSelector" class="bg-select-dropdown">
-                <option value="auto">Auto</option>
-                <option value="white">Blanco</option>
-                <option value="gray">Gris</option>
-                <option value="black">Negro</option>
-                <option value="transparent">Alfa</option>
-            </select>
         </div>
     </div>
 
@@ -128,7 +118,6 @@
         const $ = id => document.getElementById(id);
         const filesInput = $("files"), alpha = $("alpha"), alphaValue = $("alphaValue"), reverseBtn = $("reverseBtn"), randomBtn = $("randomBtn"), downloadBtn = $("downloadBtn"), status = $("status"), canvas = $("canvas"), ctx = canvas.getContext("2d");
         const opacityTrigger = $("opacityTrigger"), opacityOptions = $("opacityOptions"), blendTrigger = $("blendTrigger"), blendOptions = $("blendOptions");
-        const bgColorSelector = $("bgColorSelector");
 
         let currentOpacityMode = "fixed", currentBlendMode = "source-over", files = [];
         let noiseOffsets = [];
@@ -203,16 +192,8 @@
             }
         }
 
+        // Lógica "Auto" inteligente calibrada por vos
         function getAdaptiveBgColor(mode) {
-            const selectedBg = bgColorSelector.value;
-
-            // Si el usuario eligió algo manual, saltamos la lógica "Auto"
-            if (selectedBg === "white") return "#ffffff";
-            if (selectedBg === "black") return "#000000";
-            if (selectedBg === "gray") return "#808080";
-            if (selectedBg === "transparent") return "#0000";
-
-            // Lógica "Auto" inteligente original
             const darkModes = ["multiply"];
             const lightModes = ["screen", "lighten", "exclusion"];
             const alphaModes = ["hue", "saturation", "color", "color-burn", "color-dodge"];
@@ -244,7 +225,7 @@
                 canvas.width = width; canvas.height = height;
                 tempCanvas.width = width; tempCanvas.height = height;
 
-                // --- INYECCIÓN DE CAPA BASE ADAPTATIVA / MANUAL ---
+                // --- INYECCIÓN DE CAPA BASE ADAPTATIVA AUTOMÁTICA ---
                 ctx.clearRect(0, 0, width, height);
                 ctx.fillStyle = getAdaptiveBgColor(currentBlendMode);
                 ctx.fillRect(0, 0, width, height);
@@ -275,7 +256,7 @@
                         tempCtx.globalCompositeOperation = "source-in";
                         tempCtx.drawImage(img, 0, 0, width, height);
                         ctx.globalAlpha = 1.0;
-                        ctx.globalCompositeOperation = "currentBlendMode" ? currentBlendMode : "source-over";
+                        ctx.globalCompositeOperation = currentBlendMode;
                         ctx.drawImage(tempCanvas, 0, 0);
 
                     } else {
@@ -313,8 +294,7 @@
             const blendName = blendOptions.querySelector(`[data-value="${currentBlendMode}"]`).textContent;
             const opacityName = opacityOptions.querySelector(`[data-value="${currentOpacityMode}"]`).textContent;
 
-            const baseTxt = bgColorSelector.options[bgColorSelector.selectedIndex].text;
-            status.textContent = `${files.length} imgs · ${opacityName} · ${blendName} · Base: ${baseTxt}`;
+            status.textContent = `${files.length} imgs · ${blendName} · ${opacityName}`;
         }
 
         filesInput.addEventListener("change", () => {
@@ -327,8 +307,6 @@
 
         alpha.addEventListener("input", updateUI);
         alpha.addEventListener("change", render);
-
-        bgColorSelector.addEventListener("change", render);
 
         reverseBtn.addEventListener("click", () => { if (!files.length) return; shuffle(files); generateRandomOffsets(); render(); });
 
