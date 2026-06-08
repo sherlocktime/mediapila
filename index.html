@@ -59,9 +59,10 @@
 
     <div class="control-panel">
         <div class="controls-row">
-            <label class="file-upload-label">Cargar Fotos<input id="files" type="file" multiple accept="image/*"></label>
+            <label class="file-upload-label">Cargar Fotos<input id="files" type="file" multiple
+                    accept="image/*"></label>
             <button id="randomBtn" class="icon-btn" title="Aleatorio">⚡</button>
-            <button id="downloadBtn" class="rect-btn">Descargar Imagen</button>
+            <button id="downloadBtn" class="rect-btn">Guardar Imagen</button>
         </div>
 
         <div class="controls-row">
@@ -106,7 +107,7 @@
             </div>
         </div>
 
-        <div class="controls-row full-width">
+        <div class="controls-row">
             <div class="slider-group">
                 <span id="alphaValue" style="font-size:12px;width:35px;font-weight:500">30%</span>
                 <input type="range" id="alpha" min="1" max="100" value="30">
@@ -133,6 +134,7 @@
         const tempCanvas = document.createElement("canvas");
         const tempCtx = tempCanvas.getContext("2d");
 
+        // 1. Genera coordenadas y escalas aleatorias para posicionar las texturas de ruido
         function generateRandomOffsets() {
             noiseOffsets = files.map(() => ({
                 x: Math.random() * 1024,
@@ -146,15 +148,17 @@
             blendOptions.classList.remove("show");
         }
 
+        // 2. Control de doble tap para alternar la visualización en pantalla completa
         let lastTap = 0;
         canvas.addEventListener("click", () => {
             if (!files.length) return;
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
-            if (tapLength < 300 && tapLength > 0) {  canvas.classList.toggle("fullscreen"); }
+            if (tapLength < 300 && tapLength > 0) { canvas.classList.toggle("fullscreen"); }
             lastTap = currentTime;
         });
 
+        // 3. Manejo genérico y apertura/cierre de los dropdowns personalizados
         function setupCustomSelect(trigger, optionsContainer, onChangeCallback) {
             trigger.addEventListener("click", e => {
                 e.stopPropagation();
@@ -201,18 +205,19 @@
             }
         }
 
-        // Lógica "Auto" inteligente calibrada por vos
+        // 4. Retorna el color base del lienzo según el blend mode activo para optimizar la fusión
         function getAdaptiveBgColor(mode) {
             const darkModes = ["multiply"];
             const lightModes = ["screen", "lighten", "exclusion"];
             const alphaModes = ["hue", "saturation", "color", "color-burn", "color-dodge"];
 
-            if (darkModes.includes(mode)) return "#ffffff"; // Blanco
-            if (lightModes.includes(mode)) return "#000000"; // Negro
-            if (alphaModes.includes(mode)) return "#0000"; // Alfa
-            return "#808080"; // Gris por defecto
+            if (darkModes.includes(mode)) return "#ffffff";
+            if (lightModes.includes(mode)) return "#000000";
+            if (alphaModes.includes(mode)) return "#0000";
+            return "#808080";
         }
 
+        // 5. Núcleo de renderizado: Redimensiona el canvas y dibuja la pila con sus opacidades y mezclas
         async function render() {
             if (!files.length) return;
             if (currentOpacityMode === "noise_A" && !noiseImage.src.includes("ruido_A.png")) return;
@@ -234,7 +239,6 @@
                 canvas.width = width; canvas.height = height;
                 tempCanvas.width = width; tempCanvas.height = height;
 
-                // --- INYECCIÓN DE CAPA BASE ADAPTATIVA AUTOMÁTICA ---
                 ctx.clearRect(0, 0, width, height);
                 ctx.fillStyle = getAdaptiveBgColor(currentBlendMode);
                 ctx.fillRect(0, 0, width, height);
@@ -319,6 +323,7 @@
 
         reverseBtn.addEventListener("click", () => { if (!files.length) return; shuffle(files); generateRandomOffsets(); render(); });
 
+        // 6. Generador aleatorio de parámetros de mezcla, tipos de opacidad y valores de slider
         randomBtn.addEventListener("click", () => {
             if (!files.length) return;
             currentBlendMode = randomItem(blendModes);
@@ -336,8 +341,23 @@
             else render();
         });
 
+        // 7. Sistema de doble click con timeout de descarte para evitar descargas accidentales
+        let downloadTimeout;
         downloadBtn.addEventListener("click", () => {
             if (!canvas.width) return;
+
+            if (!downloadBtn.classList.contains("confirming")) {
+                downloadBtn.classList.add("confirming");
+                downloadBtn.textContent = "Toca para confirmar";
+                downloadBtn.style.background = "#248a3d";
+
+                downloadTimeout = setTimeout(() => { resetDownloadButton(); }, 3000);
+                return;
+            }
+
+            clearTimeout(downloadTimeout);
+            resetDownloadButton();
+
             status.textContent = "Preparando descarga...";
             setTimeout(() => {
                 const exportCanvas = document.createElement("canvas");
@@ -353,6 +373,12 @@
                 updateStatus();
             }, 50);
         });
+
+        function resetDownloadButton() {
+            downloadBtn.classList.remove("confirming");
+            downloadBtn.textContent = "Descargar Imagen";
+            downloadBtn.style.background = "";
+        }
 
         noiseImage.src = "ruido_A.png";
         updateUI();
